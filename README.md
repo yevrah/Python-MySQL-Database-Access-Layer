@@ -58,18 +58,18 @@ database is not expected, for example, INSERT, UPDATES and DELETES. It returns a
 tuple containing new identifiers and rows affected.
 
 ```python
-new_id, rows_affected = dbaempty( query, params, database )
+new_id, rows_affected = dba.empty( query, params, database )
 ```
 
 Example
 
 ```python
-dbaempty( "CREATE DATABASE IF NOT EXISTS test" , None, db.Test )
-dbaempty( "DROP TABLE IF EXISTS Authors" , None, db.Test )
-dbaempty( "CREATE TABLE Authors(Id INT PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(25)) ENGINE=INNODB" , 
+dba.empty( "CREATE DATABASE IF NOT EXISTS test" , None, db.Test )
+dba.empty( "DROP TABLE IF EXISTS Authors" , None, db.Test )
+dba.empty( "CREATE TABLE Authors(Id INT PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(25)) ENGINE=INNODB" , 
             None, db.Test )
 
-print "Inserting new row, id: %s, rows affected: %s" % dbaempty(
+print "Inserting new row, id: %s, rows affected: %s" % dba.empty(
     "INSERT INTO Authors ( Name ) VALUES ( %s )",
     ("Text Single Quote's",),
     db.Test
@@ -81,13 +81,13 @@ print "Inserting new row, id: %s, rows affected: %s" % dbaempty(
 This function provides a convenient way to get a single result, such as a row count
 
 ```python
-result = dbascalar( query, params, database )
+result = dba.scalar( query, params, database )
 ```
 
 Example
 
 ```python
-print "Testing scalar query, total authors currently in db: ", dbascalar("SELECT Count(*) FROM Authors", None, db.Test)
+print "Testing scalar query, total authors currently in db: ", dba.scalar("SELECT Count(*) FROM Authors", None, db.Test)
 ```
 #### Dictionary result
 
@@ -95,13 +95,13 @@ The function returns an array of dictionary results
 
 
 ```python
-results = dbadict( query, params, database )
+results = dba.dict( query, params, database )
 ```
 
 Example
 
 ```python
-for author in dbadict('SELECT Id, Name FROM Authors', None, db.Test):
+for author in dba.dict('SELECT Id, Name FROM Authors', None, db.Test):
     print "Author; %s" % author['Name']
 ```
 
@@ -110,14 +110,14 @@ for author in dbadict('SELECT Id, Name FROM Authors', None, db.Test):
 The function returns a JSON object containing the results
 
 ```python
-results = dbajson( query, params, database )
+results = dba.json( query, params, database )
 ```
 
 Example
 
 ```python
 print  "List of current authors: ", 
-       dbajson('SELECT * FROM Authors', None, db.Test)
+       dba.json('SELECT * FROM Authors', None, db.Test)
 ```
 
 #### Multiple transactions
@@ -128,7 +128,7 @@ back. The results is aa tuple of the (new_id, rows_affected) for each query -
 in order of the original list of queries.
 
 ```python
-results = dbatransaction( ( (query, params), .. ), database )
+results = dba.transaction( ( (query, params), .. ), database )
 ```
 
 Simple Example
@@ -152,7 +152,7 @@ setup = (
     ( "INSERT INTO Authors ( Name ) VALUES ( %s )" ,  ( 'Terry Pratchett'   ,  )  ),
 )
 
-print "List of new identifiers and rows affected", dbatransaction(setup, db.Test)
+print "List of new identifiers and rows affected", dba.transaction(setup, db.Test)
 ```
 
 #### Full Example
@@ -164,9 +164,9 @@ from config import db
 print 'Testing MySQL DB Access'
 
 print "Creating database and tables.."
-dbaempty( "CREATE DATABASE IF NOT EXISTS test" , None, db.Test )
-dbaempty( "DROP TABLE IF EXISTS Authors" , None, db.Test )
-dbaempty( "CREATE TABLE Authors(Id INT PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(25)) ENGINE=INNODB" , 
+dba.empty( "CREATE DATABASE IF NOT EXISTS test" , None, db.Test )
+dba.empty( "DROP TABLE IF EXISTS Authors" , None, db.Test )
+dba.empty( "CREATE TABLE Authors(Id INT PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(25)) ENGINE=INNODB" , 
             None, db.Test )
 
 
@@ -175,12 +175,12 @@ print "Inserting new row, id: %s, rows affected: %s" % dbaempty(
     ("Text Single Quote's",), db.Test
 )
 
-print "Testing scalar query, total authors currently in db: ", dbascalar("SELECT Count(*) FROM Authors", None, db.Test)
+print "Testing scalar query, total authors currently in db: ", dba.scalar("SELECT Count(*) FROM Authors", None, db.Test)
 
-print  "List of current authors: ", dbadict('SELECT * FROM Authors', None,
+print  "List of current authors: ", dba.dict('SELECT * FROM Authors', None,
         db.Test)
 
-print  "List of current authors: ", dbajson('SELECT * FROM Authors', None,
+print  "List of current authors: ", dba.json('SELECT * FROM Authors', None,
         db.Test)
 
 print "Testing multiple transactions"
@@ -193,13 +193,13 @@ setup = (
     ("INSERT INTO Authors ( Name ) VALUES ( %s ) ", ('Terry Pratchett'  ,)),
 )
 
-print "List of new identifiers and rows affected", dbatransaction(setup,
+print "List of new identifiers and rows affected", dba.transaction(setup,
         db.Test)
 
 
-for author in dbadict('SELECT Id, Name FROM Authors', None, db.Test):
+for author in dba.dict('SELECT Id, Name FROM Authors', None, db.Test):
     print "Author; %s" % author['Name']
 
-print "Testing scalar query, total authors in db: ", dbascalar("SELECT Count(*) FROM Authors", None, db.Test)
+print "Testing scalar query, total authors in db: ", dba.scalar("SELECT Count(*) FROM Authors", None, db.Test)
 ```
 
